@@ -48,8 +48,8 @@ ADD ./000-tracks.conf /etc/apache2/sites-enabled/
 # Add dockerize startup script
 ##############################
 RUN apt-get install -y wget
-RUN wget https://github.com/jwilder/dockerize/releases/download/v0.0.2/dockerize-linux-amd64-v0.0.2.tar.gz
-RUN tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.0.2.tar.gz
+RUN wget https://github.com/jwilder/dockerize/releases/download/v0.0.4/dockerize-linux-amd64-v0.0.4.tar.gz
+RUN tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.0.4.tar.gz
 RUN chmod +x /usr/local/bin/dockerize
 RUN cd /var/www/ && chown -R www-data:www-data tracks
 
