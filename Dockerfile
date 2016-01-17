@@ -22,6 +22,12 @@ ADD ./Gemfile /var/www/tracks/
 
 ADD ./site.yml /var/www/tracks/config/
 
+# Add apache2-foreground
+
+ADD ./apache2-foreground /
+
+RUN chmod +x /apache2-foreground
+
 
 # Setup Tracks
 #######################
@@ -51,4 +57,4 @@ VOLUME ["/var/www"]
 
 EXPOSE 80
 
-CMD "dockerize" "-stdout=/var/log/apache2/access.log", "-stdout=/var/www/tracks/log/production.log", "-stderr=/var/log/apache2/error.log" "/usr/sbin/apache2ctl" "-D FOREGROUND"
+CMD "dockerize" "-stdout=/var/log/apache2/access.log", "-stdout=/var/www/tracks/log/production.log", "-stderr=/var/log/apache2/error.log" "/apache2-foreground"
