@@ -7,8 +7,7 @@ This is the easy way getting up and running with Tracks, which is one of the gre
 
 This builds main parts are:
  - Tracks 2.3.0 (stable)
- - Ubuntu 14.04 
- - Tracks 2.2.3
+ - Ubuntu 14.04
  - Apache 2 (Passenger)
  - Sqlite3
  - Dockerize (Utility to simplify running applications in docker containers)
