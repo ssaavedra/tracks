@@ -35,7 +35,7 @@ RUN cd /var/www/tracks && bundle install
 
 # Initialize database
 ######################
-RUN cd /var/www/tracks && bundle exec rake db:migrate RAILS_ENV=production && bundle exec rake assets:precompile
+RUN cd /var/www/tracks && export RAILS_ENV=production && bundle exec rake db:migrate RAILS_ENV=production && bundle exec rake assets:precompile
 
 
 # Configure Apache
