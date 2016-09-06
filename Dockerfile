@@ -1,60 +1,48 @@
-FROM ubuntu:14.04
+FROM ruby:2.3
 
-MAINTAINER Stig Tore Aannoe <staannoe@gmail.com>
+MAINTAINER Santiago Saavedra <santiagosaavedra@gmail.com>
 
-RUN apt-get update
+ENV TRACKS_VERSION 2.3.0
+ENV RAILS_ENV production
 
-RUN apt-get install -y ruby rubygems-integration bundler sqlite3 libsqlite3-dev build-essential curl unzip 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+       build-essential \
+       libsqlite3-dev \
+       sqlite3 \
+       unzip \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y apache2 libapache2-mod-passenger
+RUN mkdir -p /var/www && cd /var/www \
+  && curl -L https://github.com/TracksApp/tracks/archive/v${TRACKS_VERSION}.zip -o source.zip \
+  && unzip source.zip \
+  && rm source.zip \
+  && mv tracks-${TRACKS_VERSION} tracks \
+  && chown -R www-data:www-data tracks \
+  && rm /var/www/tracks/Gemfile
 
-# Add tracksapp
-##################
-ADD ./v2.3.0.zip /var/www/
+COPY ./Gemfile /var/www/tracks/
+COPY ./database.yml ./site.yml /var/www/tracks/config/
 
-RUN cd /var/www && unzip v2.3.0.zip && mv tracks-2.3.0 tracks && chown -R www-data:www-data tracks
+RUN chown -R www-data:www-data /var/www/tracks
 
-ADD ./database.yml /var/www/tracks/config/
+WORKDIR /var/www/tracks
 
-RUN rm /var/www/tracks/Gemfile
+USER www-data
 
-ADD ./Gemfile /var/www/tracks/
-
-ADD ./site.yml /var/www/tracks/config/
-
-# Add apache2-foreground
-
-ADD ./apache2-foreground /
-
-RUN chmod +x /apache2-foreground
-
+VOLUME ["/var/www/tracks/db"]
 
 # Setup Tracks
 #######################
-RUN cd /var/www/tracks && bundle install
+RUN bundle install
 
-# Initialize database
-######################
-RUN cd /var/www/tracks && export RAILS_ENV=production && bundle exec rake db:migrate RAILS_ENV=production && bundle exec rake assets:precompile
+RUN sed -i -e 's/serve_static_assets = false/serve_static_assets = true/' config/environments/production.rb
 
+RUN bundle exec rake db:migrate # Initialize database
 
-# Configure Apache
-#####################
+RUN bundle exec rake assets:precompile
 
-RUN rm /etc/apache2/sites-enabled/000-default.conf
-ADD ./000-tracks.conf /etc/apache2/sites-enabled/
+EXPOSE 3000
 
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
 
-# Add dockerize startup script
-##############################
-RUN apt-get install -y wget
-RUN wget https://github.com/jwilder/dockerize/releases/download/v0.0.4/dockerize-linux-amd64-v0.0.4.tar.gz
-RUN tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.0.4.tar.gz
-RUN chmod +x /usr/local/bin/dockerize
-RUN cd /var/www/ && chown -R www-data:www-data tracks
-
-VOLUME ["/var/www"]
-
-EXPOSE 80
-
-CMD "dockerize" "-stdout=/var/log/apache2/access.log", "-stdout=/var/www/tracks/log/production.log", "-stderr=/var/log/apache2/error.log" "/apache2-foreground"
