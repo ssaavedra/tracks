@@ -1,5 +1,6 @@
 Tracks
 ======
+[![Docker image layers](https://images.microbadger.com/badges/image/ssaavedra/tracks.svg)](https://microbadger.com/images/ssaavedra/tracks)
 
 Tracks is a web-based application to help you implement David Allens Getting Things Done™ methodology. It was built using Ruby on Rails.
 
