@@ -1,4 +1,4 @@
-FROM ruby:2.3
+FROM ubuntu
 
 MAINTAINER Santiago Saavedra <santiagosaavedra@gmail.com>
 
@@ -8,7 +8,12 @@ ENV RAILS_ENV production
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
        build-essential \
+       bundler \
+       curl \
        libsqlite3-dev \
+       ruby \
+       ruby-dev \
+       rubygems-integration \
        sqlite3 \
        unzip \
   && rm -rf /var/lib/apt/lists/*
@@ -24,7 +29,7 @@ RUN mkdir -p /var/www && cd /var/www \
 COPY ./Gemfile /var/www/tracks/
 COPY ./database.yml ./site.yml /var/www/tracks/config/
 
-RUN chown -R www-data:www-data /var/www/tracks
+RUN chown -R www-data:www-data /var/www/tracks /var/lib/gems/2.3.0 /usr/local/bin
 
 WORKDIR /var/www/tracks
 
